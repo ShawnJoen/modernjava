@@ -62,7 +62,9 @@ public class StreamAPI {
 		Shop s3 = new Shop("店3", 4);
 		List<Shop> Shops = Arrays.asList(s1, s2, s3);
 		String name = Shops.stream()
-					.sorted(Comparator.comparingInt(x -> x.getDistance()))
+					.sorted(Comparator.comparingInt(x -> x.getDistance())) //离我最近
+					//.max(Comparator.comparingInt(x -> x.getDistance())) //最大
+					//.min(Comparator.comparingInt(x -> x.getDistance())) //最小
 					.findFirst()
 					.get()
 					.getName();
@@ -76,6 +78,13 @@ public class StreamAPI {
 		/*
 		 * [Shop [name=店2, distance=2]]
 		 * */
+		List<Shop> Shops2 = Shops.stream()
+				.sorted(Comparator.comparingInt(x -> x.getDistance())) //离我最近
+				.limit(2).collect(Collectors.toList());//前2个
+		System.out.println(Shops2);
+		/*
+		 * [Shop [name=店2, distance=2], Shop [name=店3, distance=4]]
+		 * */
 		System.out.println(Shops.stream()
         	.filter(p -> p.getName().length() > 1)
         	.collect(Collectors.toList()));
@@ -83,11 +92,30 @@ public class StreamAPI {
 		 * All Shops
 		 * */
 		System.out.println(Shops.stream()
-					.map(p -> p.getName())
+					.map(p -> p.getName()) //只获取店名称
 					.findFirst());
 		/*
 		 * Optional[店1]
 		 * */
+		Map<String, Integer> nameAndDistanceMap = Shops.stream()
+				.collect(Collectors.toMap(Shop::getName, Shop::getDistance));//制成 Key -> Value Map
+		System.out.println(nameAndDistanceMap);
+		/*
+		 * {店2=2, 店1=5, 店3=4}
+		 * */
+		Shop s2_2 = new Shop("店2-2", 2);
+		List<Shop> Shops_2 = Arrays.asList(s2_2, s1, s2, s3);
+		Map<Integer, List<Shop>> ShopsgroupingBy = Shops_2.stream()
+                .collect(Collectors.groupingBy(Shop::getDistance));//分组
+		System.out.println(ShopsgroupingBy);
+		/*
+		 * {
+		 * 2=[Shop [name=店2-2, distance=2], Shop [name=店2, distance=2]], 
+		 * 4=[Shop [name=店3, distance=4]], 
+		 * 5=[Shop [name=店1, distance=5]]
+		 * }
+		 * */
+		
 		List<List<String>> lists = new ArrayList<>();
         lists.add(Arrays.asList("11", "222"));
         lists.add(Arrays.asList("aa", "bb", "ccc", "dd"));
@@ -105,7 +133,20 @@ public class StreamAPI {
 		a11
 		a22
 		a33*/
-    	
+    	/**
+    	 * 串行和并行流
+    	 * 以上都是 串行流处理(stream())，以下为并行处理(parallelStream())
+    	 * */
+    	System.out.println(
+    			Shops_2.parallelStream()
+			        .sorted(Comparator.comparingInt(Shop::getDistance))
+			        .map(Shop::getName)
+			        .limit(2)
+			        .collect(Collectors.toList())
+			        /*
+			         * [店2-2, 店2]
+			         * */
+        );
 	}
 
 }
