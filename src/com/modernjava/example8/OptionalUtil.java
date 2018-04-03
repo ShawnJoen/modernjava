@@ -36,6 +36,19 @@ public class OptionalUtil {
 			System.out.println(e.getMessage());//输出: No value present in the Optional instance
 		}
 		
+		//map方法用来对Optional实例的值执行一系列操作。通过一组实现了Function接口
+		Optional<String> upperName = opname.map((value) -> value.toUpperCase());
+		System.out.println(upperName.orElse("No value found"));//SHAWN
+		
+		//flatMap与map（Funtion）方法类似，区别在于flatMap中的mapper返回值必须是Optional
+		//map方法的mapping函数返回值可以是任何类型T，而flatMap方法的mapping函数必须是Optional
+		upperName = opname.flatMap((value) -> Optional.of(value.toUpperCase()));
+		System.out.println(upperName.orElse("No value found"));//SHAWN
+		
+		//filter函数我们应该传入实现了Predicate接口
+		Optional<String> longName = opname.filter((value) -> value.length() > 6);
+		System.out.println(longName.orElse("The name is less than 6 characters"));//The name is less than 6 characters
+
 	}
 
 }
