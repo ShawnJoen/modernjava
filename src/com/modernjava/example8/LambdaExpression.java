@@ -3,7 +3,11 @@ package com.modernjava.example8;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class LambdaExpression {
 	public static void main(String[] args) {
@@ -39,7 +43,33 @@ public class LambdaExpression {
 				.get();
 		System.out.println("新方法 Total : " + bill);//1680.0
 		//-----------------------------Map和Reduce End
+		//-----------------------------Function<T,R> Start
+		//常用于T转R 类型转换
+		final Function<String,Integer> toInt = s -> Integer.parseInt(s);
+		System.out.println("Function<T,R>:" + toInt.apply("100"));
+		final Function<Integer,Integer> identity = t -> t;
+		System.out.println("Function<T,T>:" + identity.apply(999));
+		//-----------------------------Function<T,R> End
+		//-----------------------------Consumer<T> Start
+		//直接消费void无返回值
+		final Consumer<Integer> print = i -> System.out.println("Consumer<Integer>:" + i);
+		print.accept(4);
+		//-----------------------------Consumer<T> End
+		//-----------------------------Supplier<T> Start
+		//lazy evaluation懒惰型处理 void无返回值
+		final Supplier<String> helloSupplier = () -> "Hello ";
+		System.out.println("Supplier<String>:" + helloSupplier.get() + "world");
+		//lazy evaluation
+		long start = System.currentTimeMillis();
+		printIfValidIndex(0, () -> getVeryExpensiveValue());//等待3秒后输出The value is Shawn.后继续
+		printIfValidIndex(1, () -> getVeryExpensiveValue());//等待3秒后输出The value is Shawn.后继续
+		printIfValidIndex(-2, () -> getVeryExpensiveValue());//Invalid
+		System.out.println("Supplier it took " + 
+				((System.currentTimeMillis() - start) / 1000) + " seconds." );
+				//Supplier it took 6 seconds.
+		//-----------------------------Supplier<T> End
 		//-----------------------------Predicate Start
+		//专写条件的 返回值为 boolean
 		List<String> languages = Arrays.asList("Java", "Scala", "C++", "Haskell", "Lisp");
 		//合并两个Predicate
 		Predicate<String> startsWithJ = (n) -> n.startsWith("J");
@@ -53,7 +83,7 @@ public class LambdaExpression {
 		System.out.println("Predicate 3:"); filter2(languages, (str) -> true);//所有条件为true
 		System.out.println("Predicate 4:"); filter2(languages, (str) -> str.length() > 4);
 	}
-	
+	//--
 	public static void filter(List<String> names, Predicate<String> condition) {//java8之前版本
 		for (String name : names) {
 			if (condition.test(name)) {
@@ -68,5 +98,20 @@ public class LambdaExpression {
 		        System.out.print(name + "-");
 		    }); System.out.println("");
 	}
-	
+	//--
+	private static String getVeryExpensiveValue() {
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return "Shawn";
+	}
+	private static void printIfValidIndex(int number, Supplier<String> valueSupplier) {
+		if(number >= 0) {
+			System.out.println("The value is " + valueSupplier.get() + ".");
+		} else {
+			System.out.println("Invalid");
+		}
+	}
 }

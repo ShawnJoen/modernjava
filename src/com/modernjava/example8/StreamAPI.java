@@ -11,6 +11,7 @@ import java.util.IntSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.modernjava.Shop;
@@ -159,6 +160,25 @@ public class StreamAPI {
     	System.out.println("Sum of all prime numbers : " + stats.getSum());//129
     	System.out.println("Average of all prime numbers : " + stats.getAverage());//12.9
     	
+    	int totalReduce = Arrays.asList(1,2,3)
+    			.parallelStream()
+    			.reduce(0, (i1, i2) -> i1 + i2);//0为初始值
+    	System.out.println(totalReduce);//6
+    	
+    	long start = System.currentTimeMillis();
+    	int totalPeekReduce = Arrays.asList(1,2,3)
+	    	.parallelStream() //多线程处理 It took 2001
+	    	//.stream() //CPU core数 每个2秒 -- It took 6003
+	    	.peek(i -> {
+	    		try {
+	    			TimeUnit.SECONDS.sleep(2); 
+	    		}catch (InterruptedException e){
+	    			e.printStackTrace();
+	    		}
+	    	})
+	    	.reduce(0, (i1, i2) -> i1 + i2);
+	    	System.out.println("It took " + (System.currentTimeMillis() - start));//It took 2001
+	    	System.out.println(totalPeekReduce);//6
 	}
 
 }
