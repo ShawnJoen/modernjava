@@ -19,8 +19,6 @@ public class Main {
 		Interface 有 default方法 此方法可以有函数体
 		方法入参和返回参不同的话是普通方法
 		方法入参和返回参相同为Identity Function 不过String时内容有变化也是属于普通方法
-
-
  * */
 	
 	public static void main(String[] args) {
